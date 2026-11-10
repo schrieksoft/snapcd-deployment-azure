@@ -21,11 +21,6 @@ variable "snapcd_runner_client_secret" {
   default     = ""
   sensitive   = true
 }
-variable "ssh_private_key" {
-  description = "Private key the Runner clones private git repositories with, when there is no Key Vault. Empty for none."
-  default     = ""
-  sensitive   = true
-}
 
 // Key Vault mode: set by snapcd_server_infra_config, snapcd_runner_infra and snapcd_runner_infra_config.
 variable "tenant_id" {
@@ -40,9 +35,12 @@ variable "snapcd_runner_client_secret_reference" {
 variable "snapcd_runner_workload_identity_client_id" {
   default = ""
 }
-variable "snapcd_runner_akv_id" {
+variable "snapcd_runner_akv_name" {
   default = ""
 }
 variable "snapcd_runner_ssh_key_secret_name" {
+  default = ""
+}
+variable "snapcd_runner_ssh_public_key_openssh" {
   default = ""
 }

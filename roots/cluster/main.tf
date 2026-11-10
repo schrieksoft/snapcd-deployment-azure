@@ -80,6 +80,11 @@ resource "azurerm_kubernetes_cluster" "this" {
     snapshot_controller_enabled = true
   }
 
+  // Secrets Store CSI driver with the Azure Key Vault provider, which mounts the Runner's SSH key.
+  key_vault_secrets_provider {
+    secret_rotation_enabled = true
+  }
+
 }
 
 // Add "User" node pools

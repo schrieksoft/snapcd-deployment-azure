@@ -2,11 +2,12 @@ locals {
   use_akv = var.snapcd_server_akv_url != ""
 }
 
-// The Runner's SSH key file comes from a Kubernetes Secret, which externalsettings.json cannot fill.
-data "azurerm_key_vault_secret" "ssh" {
-  count        = local.use_akv ? 1 : 0
-  name         = var.snapcd_runner_ssh_key_secret_name
-  key_vault_id = var.snapcd_runner_akv_id
+// Without a Key Vault the SSH key is generated here and handed to the chart; with one, azrandom
+// generates it in snapcd_runner_infra_config.
+resource "tls_private_key" "ssh" {
+  count     = local.use_akv ? 0 : 1
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 // Connects as the Runner the Server pre-seeds (organization, runner and client ID are the chart's defaults).
@@ -47,7 +48,7 @@ locals {
       clientSecret = var.snapcd_runner_client_secret
     }
     ssh = {
-      privateKey = var.ssh_private_key
+      privateKey = one(tls_private_key.ssh[*].private_key_pem)
     }
   })
 
@@ -58,9 +59,38 @@ locals {
         tenantId = var.tenant_id
       }
     }
+    // The SSH key is a file, which externalsettings.json cannot supply, so the Secrets Store CSI
+    // driver mounts it from the Runner's vault with the Runner's workload identity.
     ssh = {
-      privateKey = one(data.azurerm_key_vault_secret.ssh[*].value)
+      keyVolume = {
+        csi = {
+          driver           = "secrets-store.csi.k8s.io"
+          readOnly         = true
+          volumeAttributes = { secretProviderClass = "snapcd-runner-ssh" }
+        }
+      }
+      keyVolumeKey = var.snapcd_runner_ssh_key_secret_name
     }
+    extraManifests = [{
+      apiVersion = "secrets-store.csi.x-k8s.io/v1"
+      kind       = "SecretProviderClass"
+      metadata   = { name = "snapcd-runner-ssh", namespace = var.namespace }
+      spec = {
+        provider = "azure"
+        parameters = {
+          usePodIdentity = "false"
+          clientID       = var.snapcd_runner_workload_identity_client_id
+          keyvaultName   = var.snapcd_runner_akv_name
+          tenantId       = var.tenant_id
+          objects = yamlencode({
+            array = [yamlencode({
+              objectName = var.snapcd_runner_ssh_key_secret_name
+              objectType = "secret"
+            })]
+          })
+        }
+      }
+    }]
     externalSettings = {
       content = {
         PeriodInSeconds = 300
