@@ -11,6 +11,7 @@ resource "helm_release" "snapcd_agent" {
   chart            = "snapcd-agent"
   version          = var.chart_version
   wait             = true
+  atomic           = true
   timeout          = 600
 
   // Helm merges these in order: the common values, then either the Key Vault or the local secret.

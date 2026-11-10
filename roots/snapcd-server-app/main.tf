@@ -62,6 +62,7 @@ resource "helm_release" "snapcd_server" {
   chart            = "snapcd-server"
   version          = var.chart_version
   wait             = true
+  atomic           = true
   timeout          = 900
 
   // Helm merges these in order: the common values, then either the Key Vault or the local keys.
