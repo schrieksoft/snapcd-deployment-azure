@@ -1,5 +1,5 @@
 resource "snapcd_stack" "bootstrap" {
-  name = local.stack_name
+  name = var.bootstrap_stack_name
 }
 
 data "snapcd_state_store" "bootstrap" {
@@ -12,7 +12,7 @@ locals {
 
 
 resource "snapcd_namespace" "bootstrap" {
-  name                                       = local.name
+  name                                       = var.bootstrap_namespace_name
   stack_id                                   = snapcd_stack.bootstrap.id
   default_engine                             = "OpenTofu"
   default_apply_approval_threshold           = 1

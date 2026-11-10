@@ -1,12 +1,15 @@
 locals {
-  server_url = "http://snapcd-server.${var.namespace}.svc.cluster.local:5000"
-  tls_secret = "snapcd-server-tls"
-  use_akv    = var.snapcd_server_akv_url != ""
+  server_url = "http://${var.name}.${var.name}.svc.cluster.local:5000"
+  tls_secret = "${var.name}-tls"
+  use_akv    = var.key_vault_enabled
   local_keys = local.use_akv ? 0 : 1
+
+  // Signs in with the Server's workload identity, which snapcd_server_infra_config made a db_owner user.
+  connection_string = "Server=tcp:${var.snapcd_server_mssql_server_fqdn},1433;Database=${var.snapcd_server_mssql_database_name};Authentication=Active Directory Default;Encrypt=True;Max Pool Size=500;Min Pool Size=0;Connection Timeout=300;Pooling=true"
 }
 
-// The chart's defaults are public sample keys and passwords. Without a Key Vault they are replaced
-// with the values generated below; with one, externalsettings.json reads them from the vault.
+// The chart's defaults are public sample keys and passwords. Without key_vault_enabled they are
+// replaced with the values generated below; with it, externalsettings.json reads them from the vault.
 
 resource "tls_private_key" "token_signing" {
   count     = local.local_keys
@@ -27,16 +30,6 @@ resource "random_bytes" "state_store" {
 resource "random_bytes" "secret_store" {
   count  = local.local_keys
   length = 32
-}
-
-// The SA password ends up in a connection string, so ';' and '=' are kept out of it.
-resource "random_password" "sqlserver_sa" {
-  length           = 32
-  min_upper        = 1
-  min_lower        = 1
-  min_numeric      = 1
-  min_special      = 1
-  override_special = "-_#!"
 }
 
 resource "random_password" "admin" {
@@ -62,8 +55,8 @@ resource "random_password" "agent_client_secret" {
 }
 
 resource "helm_release" "snapcd_server" {
-  name             = "snapcd-server"
-  namespace        = var.namespace
+  name             = var.name
+  namespace        = var.name
   create_namespace = true
   repository       = "oci://ghcr.io/schrieksoft/charts"
   chart            = "snapcd-server"
@@ -73,7 +66,24 @@ resource "helm_release" "snapcd_server" {
 
   // Helm merges these in order: the common values, then either the Key Vault or the local keys.
   values = [yamlencode({
-    fullnameOverride = "snapcd-server"
+    fullnameOverride = var.name
+
+    serviceAccount = {
+      annotations = {
+        "azure.workload.identity/client-id" = var.snapcd_server_workload_identity_client_id
+        "azure.workload.identity/tenant-id" = var.tenant_id
+      }
+    }
+    podLabels = {
+      "azure.workload.identity/use" = "true"
+    }
+
+    database = {
+      connectionString = local.connection_string
+    }
+    sqlserver = {
+      enabled = false
+    }
 
     config = {
       appsettings = {
@@ -89,18 +99,12 @@ resource "helm_release" "snapcd_server" {
       }
     }
 
-    sqlserver = {
-      auth = {
-        saPassword = random_password.sqlserver_sa.result
-      }
-    }
-
     // TLS ends at the Istio gateway, which forwards plain HTTP to the Server.
     extraManifests = [
       {
         apiVersion = "cert-manager.io/v1"
         kind       = "Certificate"
-        metadata   = { name = "snapcd-server", namespace = "istio-gateway" }
+        metadata   = { name = var.name, namespace = "istio-gateway" }
         spec = {
           secretName = local.tls_secret
           issuerRef  = { kind = "ClusterIssuer", name = var.cluster_issuer }
@@ -110,11 +114,11 @@ resource "helm_release" "snapcd_server" {
       {
         apiVersion = "networking.istio.io/v1beta1"
         kind       = "Gateway"
-        metadata   = { name = "snapcd-server", namespace = "istio-gateway" }
+        metadata   = { name = var.name, namespace = "istio-gateway" }
         spec = {
           selector = { istio = "gateway" }
           servers = [{
-            hosts = ["${var.namespace}/${var.public_hostname}"]
+            hosts = ["${var.name}/${var.public_hostname}"]
             port  = { name = "https", number = 443, protocol = "HTTPS" }
             tls   = { mode = "SIMPLE", credentialName = local.tls_secret }
           }]
@@ -123,13 +127,13 @@ resource "helm_release" "snapcd_server" {
       {
         apiVersion = "networking.istio.io/v1beta1"
         kind       = "VirtualService"
-        metadata   = { name = "snapcd-server", namespace = var.namespace }
+        metadata   = { name = var.name, namespace = var.name }
         spec = {
           hosts    = [var.public_hostname]
-          gateways = ["istio-gateway/snapcd-server"]
+          gateways = ["istio-gateway/${var.name}"]
           http = [{
             match = [{ uri = { prefix = "/" } }]
-            route = [{ destination = { host = "snapcd-server", port = { number = 5000 } } }]
+            route = [{ destination = { host = var.name, port = { number = 5000 } } }]
           }]
         }
       },
@@ -183,15 +187,6 @@ locals {
           }
         }
       }
-    }
-    serviceAccount = {
-      annotations = {
-        "azure.workload.identity/client-id" = var.snapcd_server_workload_identity_client_id
-        "azure.workload.identity/tenant-id" = var.tenant_id
-      }
-    }
-    podLabels = {
-      "azure.workload.identity/use" = "true"
     }
     externalSettings = {
       content = {

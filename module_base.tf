@@ -14,7 +14,7 @@ resource "snapcd_module_input_from_literal" "base" {
   for_each = { for obj in [
     {
       name          = "resource_group_name"
-      literal_value = local.name
+      literal_value = var.name
       type          = "String"
       input_kind    = "Param"
     }

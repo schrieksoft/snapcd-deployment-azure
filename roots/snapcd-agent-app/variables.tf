@@ -10,8 +10,8 @@ variable "cluster_token" {
 variable "chart_version" {
   description = "Version of the charts at oci://ghcr.io/schrieksoft/charts."
 }
-variable "namespace" {
-  default = "snapcd-agent"
+variable "name" {
+  description = "Name of the Snap CD Agent: its Kubernetes namespace, release and service account."
 }
 variable "server_url" {
   description = "Server URL as the Agent reaches it inside the cluster."
@@ -31,16 +31,17 @@ variable "claude_api_key" {
   sensitive = true
 }
 
-// Key Vault mode: set by snapcd_server_infra_config and snapcd_agent_infra.
-variable "tenant_id" {
-  default = ""
+variable "tenant_id" {}
+variable "key_vault_enabled" {
+  description = "Read secrets from the Key Vaults. False uses the ones generated in snapcd_server_app and here."
+  default     = false
 }
+variable "snapcd_agent_workload_identity_client_id" {}
+
+// Key Vault mode: set by the infra and infra-config Modules.
 variable "snapcd_server_akv_url" {
   default = ""
 }
 variable "snapcd_agent_client_secret_reference" {
-  default = ""
-}
-variable "snapcd_agent_workload_identity_client_id" {
   default = ""
 }

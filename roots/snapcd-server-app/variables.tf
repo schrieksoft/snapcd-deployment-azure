@@ -10,8 +10,8 @@ variable "cluster_token" {
 variable "chart_version" {
   description = "Version of the charts at oci://ghcr.io/schrieksoft/charts."
 }
-variable "namespace" {
-  default = "snapcd-server"
+variable "name" {
+  description = "Name of the Snap CD Server: its Kubernetes namespace, release and service account."
 }
 variable "public_hostname" {
   description = "Hostname the Server is served on through the Istio gateway."
@@ -25,14 +25,17 @@ variable "admin_email" {
   default     = "admin@preseeded.io"
 }
 
-// Key Vault mode: set by snapcd_server_infra and snapcd_server_infra_config. Empty keeps the keys generated here.
-variable "tenant_id" {
-  default = ""
+variable "tenant_id" {}
+variable "key_vault_enabled" {
+  description = "Read keys and secrets from the Server's Key Vault. False generates them here."
+  default     = false
 }
+variable "snapcd_server_workload_identity_client_id" {}
+variable "snapcd_server_mssql_server_fqdn" {}
+variable "snapcd_server_mssql_database_name" {}
+
+// Key Vault mode: set by snapcd_server_infra and snapcd_server_infra_config.
 variable "snapcd_server_akv_url" {
-  default = ""
-}
-variable "snapcd_server_workload_identity_client_id" {
   default = ""
 }
 variable "snapcd_server_token_signing_public_key_pem" {

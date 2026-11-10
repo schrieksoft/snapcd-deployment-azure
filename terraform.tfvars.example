@@ -2,7 +2,11 @@ bootstrap_snapcd_client_id       = ""
 bootstrap_snapcd_client_secret   = ""
 bootstrap_snapcd_organization_id = ""
 
-bootstrap_runner_name = ""
+bootstrap_runner_name    = ""
+bootstrap_stack_name     = "demo"
+bootstrap_namespace_name = "platform"
+
+name = "platform"
 
 tenant_id               = ""
 subscription_id         = ""

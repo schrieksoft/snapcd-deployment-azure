@@ -1,5 +1,5 @@
 locals {
-  use_akv = var.snapcd_server_akv_url != ""
+  use_akv = var.key_vault_enabled
 }
 
 // Without a Key Vault the SSH key is generated here and handed to the chart; with one, azrandom
@@ -12,8 +12,8 @@ resource "tls_private_key" "ssh" {
 
 // Connects as the Runner the Server pre-seeds (organization, runner and client ID are the chart's defaults).
 resource "helm_release" "snapcd_runner" {
-  name             = "snapcd-runner"
-  namespace        = var.namespace
+  name             = var.name
+  namespace        = var.name
   create_namespace = true
   repository       = "oci://ghcr.io/schrieksoft/charts"
   chart            = "snapcd-runner"
@@ -23,7 +23,14 @@ resource "helm_release" "snapcd_runner" {
 
   // Helm merges these in order: the common values, then either the Key Vault or the local secret.
   values = [yamlencode({
-    fullnameOverride = "snapcd-runner"
+    fullnameOverride = var.name
+
+    workloadIdentity = {
+      azure = {
+        clientId = var.snapcd_runner_workload_identity_client_id
+        tenantId = var.tenant_id
+      }
+    }
 
     config = {
       appsettings = {
@@ -53,12 +60,6 @@ locals {
   })
 
   akv_values_yaml = yamlencode({
-    workloadIdentity = {
-      azure = {
-        clientId = var.snapcd_runner_workload_identity_client_id
-        tenantId = var.tenant_id
-      }
-    }
     // The SSH key is a file, which externalsettings.json cannot supply, so the Secrets Store CSI
     // driver mounts it from the Runner's vault with the Runner's workload identity.
     ssh = {
@@ -66,7 +67,7 @@ locals {
         csi = {
           driver           = "secrets-store.csi.k8s.io"
           readOnly         = true
-          volumeAttributes = { secretProviderClass = "snapcd-runner-ssh" }
+          volumeAttributes = { secretProviderClass = "${var.name}-ssh" }
         }
       }
       keyVolumeKey = var.snapcd_runner_ssh_key_secret_name
@@ -74,7 +75,7 @@ locals {
     extraManifests = [{
       apiVersion = "secrets-store.csi.x-k8s.io/v1"
       kind       = "SecretProviderClass"
-      metadata   = { name = "snapcd-runner-ssh", namespace = var.namespace }
+      metadata   = { name = "${var.name}-ssh", namespace = var.name }
       spec = {
         provider = "azure"
         parameters = {

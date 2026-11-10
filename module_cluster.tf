@@ -88,13 +88,13 @@ resource "snapcd_module_input_from_literal" "cluster" {
     },
     {
       name          = "name"
-      literal_value = local.name
+      literal_value = var.name
       type          = "String"
       input_kind    = "Param"
     },
     {
       name          = "kubernetes_version"
-      literal_value = "1.36.2"
+      literal_value = "1.37.1"
       type          = "String"
       input_kind    = "Param"
     },

@@ -12,20 +12,31 @@ resource "snapcd_module" "snapcd_runner_app" {
 resource "snapcd_module_input_from_literal" "snapcd_runner_app" {
   for_each = { for obj in [
     {
+      name          = "name"
+      literal_value = var.snapcd_runner_name
+      type          = "String"
+    },
+    {
+      name          = "key_vault_enabled"
+      literal_value = var.key_vault_enabled
+      type          = "NotString"
+    },
+    {
       name          = "chart_version"
       literal_value = local.snapcd_chart_version
+      type          = "String"
     },
   ] : obj.name => obj }
 
   name          = each.value.name
   literal_value = each.value.literal_value
-  type          = "String"
+  type          = each.value.type
   input_kind    = "Param"
   module_id     = snapcd_module.snapcd_runner_app.id
 }
 
 resource "snapcd_module_input_from_output" "snapcd_runner_app" {
-  for_each = { for obj in concat([
+  for_each = { for obj in [
     {
       name             = "cluster_host"
       output_name      = "cluster_host"
@@ -46,13 +57,12 @@ resource "snapcd_module_input_from_output" "snapcd_runner_app" {
       output_name      = "snapcd_server_url_in_cluster"
       output_module_id = snapcd_module.snapcd_server_app.id
     },
-    ], var.key_vault_enabled ? [] : [
     {
       name             = "snapcd_runner_client_secret"
       output_name      = "snapcd_runner_client_secret"
       output_module_id = snapcd_module.snapcd_server_app.id
     },
-  ]) : obj.name => obj }
+  ] : obj.name => obj }
 
   name             = each.value.name
   output_name      = each.value.output_name
@@ -62,24 +72,24 @@ resource "snapcd_module_input_from_output" "snapcd_runner_app" {
 }
 
 resource "snapcd_module_input_from_output_set" "snapcd_runner_app" {
-  for_each = { for obj in var.key_vault_enabled ? [
+  for_each = { for obj in [
     {
       name             = "from_snapcd_server_infra"
-      output_module_id = local.snapcd_server_infra_id
+      output_module_id = snapcd_module.snapcd_server_infra.id
     },
     {
       name             = "from_snapcd_server_infra_config"
-      output_module_id = local.snapcd_server_infra_config_id
+      output_module_id = snapcd_module.snapcd_server_infra_config.id
     },
     {
       name             = "from_snapcd_runner_infra"
-      output_module_id = local.snapcd_runner_infra_id
+      output_module_id = snapcd_module.snapcd_runner_infra.id
     },
     {
       name             = "from_snapcd_runner_infra_config"
-      output_module_id = local.snapcd_runner_infra_config_id
+      output_module_id = snapcd_module.snapcd_runner_infra_config.id
     },
-  ] : [] : obj.name => obj }
+  ] : obj.name => obj }
 
   name             = each.value.name
   output_module_id = each.value.output_module_id

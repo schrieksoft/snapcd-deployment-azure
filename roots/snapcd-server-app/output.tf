@@ -10,18 +10,18 @@ output "admin_email" {
   value = var.admin_email
 }
 
-// The three secrets below are null with a Key Vault: they are in the vault instead.
+// The three secrets below are empty with key_vault_enabled: they are in the vault instead.
 output "admin_password" {
-  value     = one(random_password.admin[*].result)
+  value     = try(random_password.admin[0].result, "")
   sensitive = true
 }
 
 output "snapcd_runner_client_secret" {
-  value     = one(random_password.runner_client_secret[*].result)
+  value     = try(random_password.runner_client_secret[0].result, "")
   sensitive = true
 }
 
 output "snapcd_agent_client_secret" {
-  value     = one(random_password.agent_client_secret[*].result)
+  value     = try(random_password.agent_client_secret[0].result, "")
   sensitive = true
 }

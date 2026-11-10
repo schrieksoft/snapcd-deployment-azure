@@ -1,11 +1,11 @@
 locals {
-  use_akv = var.snapcd_server_akv_url != ""
+  use_akv = var.key_vault_enabled
 }
 
 // Connects as the Agent the Server pre-seeds (organization, agent and client ID are the chart's defaults).
 resource "helm_release" "snapcd_agent" {
-  name             = "snapcd-agent"
-  namespace        = var.namespace
+  name             = var.name
+  namespace        = var.name
   create_namespace = true
   repository       = "oci://ghcr.io/schrieksoft/charts"
   chart            = "snapcd-agent"
@@ -15,7 +15,17 @@ resource "helm_release" "snapcd_agent" {
 
   // Helm merges these in order: the common values, then either the Key Vault or the local secret.
   values = [yamlencode({
-    fullnameOverride = "snapcd-agent"
+    fullnameOverride = var.name
+
+    serviceAccount = {
+      annotations = {
+        "azure.workload.identity/client-id" = var.snapcd_agent_workload_identity_client_id
+        "azure.workload.identity/tenant-id" = var.tenant_id
+      }
+    }
+    podLabels = {
+      "azure.workload.identity/use" = "true"
+    }
 
     config = {
       appsettings = {
@@ -25,7 +35,9 @@ resource "helm_release" "snapcd_agent" {
       }
     }
 
+    // The chart refuses a sidecar with no Claude credential; without one the Agent runs without it.
     sidecar = {
+      enabled = var.claude_oauth_token != "" || var.claude_api_key != ""
       credentials = {
         oauthToken = var.claude_oauth_token
         apiKey     = var.claude_api_key
@@ -42,15 +54,6 @@ locals {
   })
 
   akv_values_yaml = yamlencode({
-    serviceAccount = {
-      annotations = {
-        "azure.workload.identity/client-id" = var.snapcd_agent_workload_identity_client_id
-        "azure.workload.identity/tenant-id" = var.tenant_id
-      }
-    }
-    podLabels = {
-      "azure.workload.identity/use" = "true"
-    }
     externalSettings = {
       content = {
         PeriodInSeconds = 300

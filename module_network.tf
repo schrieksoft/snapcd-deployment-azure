@@ -13,7 +13,7 @@ resource "snapcd_module_input_from_literal" "network" {
   for_each = { for obj in [
     {
       name          = "vnet_name"
-      literal_value = local.name
+      literal_value = var.name
       type          = "String"
     },
   ] : obj.name => obj }

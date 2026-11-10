@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.20.0"
     }
+    mssql = {
+      source  = "registry.terraform.io/schrieksoft/mssql"
+      version = "0.1.1"
+    }
     random = {
       source  = "hashicorp/random"
       version = "3.7.2"
