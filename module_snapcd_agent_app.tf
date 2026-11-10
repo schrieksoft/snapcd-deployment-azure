@@ -1,12 +1,12 @@
 resource "snapcd_module" "snapcd_agent_app" {
   name                 = "snapcd_agent_app"
-  namespace_id         = snapcd_namespace.platform.id
+  namespace_id         = snapcd_namespace.bootstrap.id
   source_revision      = "main"
   source_revision_type = "Default"
   source_type          = "Git"
   source_url           = local.source_url
   source_subdirectory  = "roots/snapcd-agent-app"
-  runner_id            = data.snapcd_runner.platform.id
+  runner_id            = data.snapcd_runner.bootstrap.id
 }
 
 resource "snapcd_module_input_from_literal" "snapcd_agent_app" {
@@ -86,7 +86,7 @@ resource "snapcd_module_input_from_output_set" "snapcd_agent_app" {
 data "snapcd_stack_secret" "claude_oauth_token" {
   count    = var.claude_oauth_token_secret_name == "" ? 0 : 1
   name     = var.claude_oauth_token_secret_name
-  stack_id = snapcd_stack.this.id
+  stack_id = snapcd_stack.bootstrap.id
 }
 
 resource "snapcd_module_input_from_secret" "snapcd_agent_app_claude_oauth_token" {

@@ -1,17 +1,18 @@
-variable "snapcd_url" {
-  default = "http://localhost:9000"
+variable "bootstrap_snapcd_url" {
+  default     = "http://localhost:5000"
+  description = "The bootstrap Snap CD Server that deploys this configuration, as this machine reaches it."
 }
-variable "snapcd_client_id" {}
-variable "snapcd_client_secret" {
+variable "bootstrap_snapcd_client_id" {}
+variable "bootstrap_snapcd_client_secret" {
   sensitive = true
 }
-variable "snapcd_organization_id" {}
-variable "snapcd_server_url_from_runner" {
+variable "bootstrap_snapcd_organization_id" {}
+variable "bootstrap_snapcd_server_url_from_runner" {
   default     = "http://snapcd-server:5000"
-  description = "Snap CD server URL as the runners reach it, for the state store backend."
+  description = "The bootstrap Snap CD Server as its Runner reaches it, for the State Store backend."
 }
 
-variable "platform_runner_name" {}
+variable "bootstrap_runner_name" {}
 
 variable "tenant_id" {}
 variable "subscription_id" {}

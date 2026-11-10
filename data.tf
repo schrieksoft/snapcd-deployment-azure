@@ -1,3 +1,3 @@
-data "snapcd_runner" "platform" {
-  name = var.platform_runner_name
+data "snapcd_runner" "bootstrap" {
+  name = var.bootstrap_runner_name
 }

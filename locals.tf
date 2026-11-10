@@ -10,4 +10,11 @@ locals {
 
   before_hook_base = <<EOT
 EOT
+  
+  snapcd_server_infra_id        = one(snapcd_module.snapcd_server_infra[*].id)
+  snapcd_server_infra_config_id = one(snapcd_module.snapcd_server_infra_config[*].id)
+  snapcd_runner_infra_id        = one(snapcd_module.snapcd_runner_infra[*].id)
+  snapcd_runner_infra_config_id = one(snapcd_module.snapcd_runner_infra_config[*].id)
+  snapcd_agent_infra_id         = one(snapcd_module.snapcd_agent_infra[*].id)
+  
 }

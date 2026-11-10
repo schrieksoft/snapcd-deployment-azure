@@ -1,13 +1,13 @@
 resource "snapcd_module" "snapcd_server_infra" {
   count                = var.key_vault_enabled ? 1 : 0
   name                 = "snapcd_server_infra"
-  namespace_id         = snapcd_namespace.platform.id
+  namespace_id         = snapcd_namespace.bootstrap.id
   source_revision      = "main"
   source_revision_type = "Default"
   source_type          = "Git"
   source_url           = local.source_url
   source_subdirectory  = "roots/snapcd-server-infra"
-  runner_id            = data.snapcd_runner.platform.id
+  runner_id            = data.snapcd_runner.bootstrap.id
 }
 
 resource "snapcd_module_input_from_output" "snapcd_server_infra" {

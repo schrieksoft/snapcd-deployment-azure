@@ -1,8 +1,8 @@
-snapcd_client_id       = ""
-snapcd_client_secret   = ""
-snapcd_organization_id = ""
+bootstrap_snapcd_client_id       = ""
+bootstrap_snapcd_client_secret   = ""
+bootstrap_snapcd_organization_id = ""
 
-platform_runner_name = ""
+bootstrap_runner_name = ""
 
 tenant_id               = ""
 subscription_id         = ""

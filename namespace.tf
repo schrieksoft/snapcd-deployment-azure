@@ -1,19 +1,19 @@
-resource "snapcd_stack" "this" {
+resource "snapcd_stack" "bootstrap" {
   name = local.stack_name
 }
 
-data "snapcd_state_store" "default" {
+data "snapcd_state_store" "bootstrap" {
   name = "default"
 }
 
 locals {
-  platform_state_url = "${var.snapcd_server_url_from_runner}/api/${var.snapcd_organization_id}/state/${data.snapcd_state_store.default.id}"
+  bootstrap_state_url = "${var.bootstrap_snapcd_server_url_from_runner}/api/${var.bootstrap_snapcd_organization_id}/state/${data.snapcd_state_store.bootstrap.id}"
 }
 
 
-resource "snapcd_namespace" "platform" {
+resource "snapcd_namespace" "bootstrap" {
   name                                       = local.name
-  stack_id                                   = snapcd_stack.this.id
+  stack_id                                   = snapcd_stack.bootstrap.id
   default_engine                             = "OpenTofu"
   default_apply_approval_threshold           = 1
   default_destroy_approval_threshold         = 1
@@ -21,7 +21,7 @@ resource "snapcd_namespace" "platform" {
   default_trigger_path_filter_enabled        = true
 }
 
-# resource "snapcd_namespace_hook" "platform_before_hooks" {
+# resource "snapcd_namespace_hook" "bootstrap_before_hooks" {
 #   for_each = toset([
 #     "Init",
 #     "Validate",
@@ -32,40 +32,40 @@ resource "snapcd_namespace" "platform" {
 #     "Destroy",
 #   ])
 # 
-#   namespace_id = snapcd_namespace.platform.id
+#   namespace_id = snapcd_namespace.bootstrap.id
 #   task         = each.value
 #   phase        = "Before"
 #   script       = local.before_hook_base
 # }
 
-resource "snapcd_namespace_terraform_flag" "platform_flags" {
+resource "snapcd_namespace_terraform_flag" "bootstrap_flags" {
   for_each = toset(["Upgrade", "MigrateState"])
 
-  namespace_id = snapcd_namespace.platform.id
+  namespace_id = snapcd_namespace.bootstrap.id
   task         = "Init"
   flag         = each.value
 }
 
 
-resource "snapcd_namespace_terraform_array_flag" "platform_backend_config" {
+resource "snapcd_namespace_terraform_array_flag" "bootstrap_backend_config" {
   for_each = {
-    address        = "${local.platform_state_url}/$${NamespaceName}--$${ModuleName}"
-    lock_address   = "${local.platform_state_url}/$${NamespaceName}--$${ModuleName}/lock"
-    unlock_address = "${local.platform_state_url}/$${NamespaceName}--$${ModuleName}/unlock"
+    address        = "${local.bootstrap_state_url}/$${NamespaceName}--$${ModuleName}"
+    lock_address   = "${local.bootstrap_state_url}/$${NamespaceName}--$${ModuleName}/lock"
+    unlock_address = "${local.bootstrap_state_url}/$${NamespaceName}--$${ModuleName}/unlock"
     lock_method    = "POST"
     unlock_method  = "POST"
     username       = "$${SNAPCD_CLIENT_ID}"
     password       = "$${SNAPCD_CLIENT_SECRET}"
   }
 
-  namespace_id = snapcd_namespace.platform.id
+  namespace_id = snapcd_namespace.bootstrap.id
   task         = "Init"
   flag         = "BackendConfig"
   value        = "${each.key}=${each.value}"
 }
 
 
-resource "snapcd_namespace_input_from_definition" "platform" {
+resource "snapcd_namespace_input_from_definition" "bootstrap" {
   for_each = { for obj in [
 
     // Params
@@ -124,11 +124,11 @@ resource "snapcd_namespace_input_from_definition" "platform" {
   name            = each.value.name
   definition_name = each.value.definition_name
   usage_mode      = each.value.usage_mode
-  namespace_id    = snapcd_namespace.platform.id
+  namespace_id    = snapcd_namespace.bootstrap.id
   input_kind      = each.value.input_kind
 }
 
-resource "snapcd_namespace_input_from_literal" "platform" {
+resource "snapcd_namespace_input_from_literal" "bootstrap" {
   for_each = { for obj in [
 
     // EnvVars
@@ -187,11 +187,11 @@ resource "snapcd_namespace_input_from_literal" "platform" {
   type          = each.value.type
   literal_value = each.value.literal_value
   usage_mode    = each.value.usage_mode
-  namespace_id  = snapcd_namespace.platform.id
+  namespace_id  = snapcd_namespace.bootstrap.id
   input_kind    = each.value.input_kind
 }
 
-resource "snapcd_namespace_extra_file" "platform" {
+resource "snapcd_namespace_extra_file" "bootstrap" {
   for_each = { for obj in [
     {
       file_name = "extra_namespace_root.tf"
@@ -242,11 +242,11 @@ variable "extra_tenant_id" {}
 
   file_name    = each.value.file_name
   contents     = each.value.contents
-  namespace_id = snapcd_namespace.platform.id
+  namespace_id = snapcd_namespace.bootstrap.id
   overwrite    = false
 }
 
-resource "snapcd_runner_namespace_supply" "platform" {
-  runner_id    = data.snapcd_runner.platform.id
-  namespace_id = snapcd_namespace.platform.id
+resource "snapcd_runner_namespace_supply" "bootstrap" {
+  runner_id    = data.snapcd_runner.bootstrap.id
+  namespace_id = snapcd_namespace.bootstrap.id
 }
