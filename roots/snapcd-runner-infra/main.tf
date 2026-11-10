@@ -46,3 +46,25 @@ resource "time_sleep" "role_propagation" {
   depends_on      = [module.akv, azurerm_role_assignment.akv_secrets_user]
   create_duration = "120s"
 }
+
+/////////////////////////////////////////////////////////////////
+// Admin rights: this Runner deploys the platform tenancy
+/////////////////////////////////////////////////////////////////
+
+data "azurerm_kubernetes_cluster" "this" {
+  name                = var.cluster_name
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_role_assignment" "subscription" {
+  for_each             = toset(["Contributor", "User Access Administrator"])
+  scope                = "/subscriptions/${var.subscription_id}"
+  role_definition_name = each.value
+  principal_id         = module.workload_identity.principal_id
+}
+
+resource "azurerm_role_assignment" "cluster_admin" {
+  scope                = data.azurerm_kubernetes_cluster.this.id
+  role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
+  principal_id         = module.workload_identity.principal_id
+}

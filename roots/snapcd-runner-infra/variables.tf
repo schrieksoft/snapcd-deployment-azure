@@ -13,3 +13,4 @@ variable "snapcd_server_akv_id" {}
 variable "snapcd_runner_client_secret_name" {
   description = "Secret in the Server's Key Vault holding the Runner's client secret."
 }
+variable "subscription_id" {}
