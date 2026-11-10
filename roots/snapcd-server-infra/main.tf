@@ -1,3 +1,7 @@
+locals {
+  asb = var.bus_type == "AzureServiceBus" ? 1 : 0
+}
+
 data "azurerm_client_config" "current" {}
 
 module "akv" {
@@ -85,6 +89,37 @@ resource "azurerm_mssql_database" "this" {
   sku_name    = var.sql_database_sku
   max_size_gb = var.sql_database_max_size_gb
   collation   = "SQL_Latin1_General_CP1_CI_AS"
+}
+
+/////////////////////////////////////////////////////////////////
+// Azure Service Bus, with bus_type AzureServiceBus
+/////////////////////////////////////////////////////////////////
+
+resource "random_string" "servicebus_namespace" {
+  count   = local.asb
+  length  = 8
+  numeric = true
+  lower   = true
+  upper   = false
+  special = false
+}
+
+// Standard is the lowest tier with topics, which MassTransit publishes through.
+resource "azurerm_servicebus_namespace" "this" {
+  count               = local.asb
+  name                = "${var.name}-${random_string.servicebus_namespace[0].result}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  sku                 = "Standard"
+  local_auth_enabled  = false
+}
+
+// Data Owner, because MassTransit creates its own queues, topics and subscriptions.
+resource "azurerm_role_assignment" "servicebus_data_owner" {
+  count                = local.asb
+  scope                = azurerm_servicebus_namespace.this[0].id
+  role_definition_name = "Azure Service Bus Data Owner"
+  principal_id         = module.workload_identity.principal_id
 }
 
 // Key Vault data-plane role assignments take a few minutes to apply.

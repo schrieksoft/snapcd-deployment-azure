@@ -10,7 +10,7 @@ output "login_instructions" {
 }
 
 output "cluster_host" {
-  value = azurerm_kubernetes_cluster.this.kube_admin_config.0.host
+  value     = azurerm_kubernetes_cluster.this.kube_admin_config.0.host
   sensitive = true
 }
 
@@ -25,11 +25,11 @@ output "cluster_token" {
 }
 
 output "cluster_kube_config_raw" {
-  value = azurerm_kubernetes_cluster.this.kube_config_raw
+  value     = azurerm_kubernetes_cluster.this.kube_config_raw
   sensitive = true
 }
 output "cluster_kube_admin_config_raw" {
-  value = azurerm_kubernetes_cluster.this.kube_admin_config_raw
+  value     = azurerm_kubernetes_cluster.this.kube_admin_config_raw
   sensitive = true
 }
 

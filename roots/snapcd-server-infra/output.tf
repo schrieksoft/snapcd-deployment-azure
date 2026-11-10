@@ -19,3 +19,8 @@ output "snapcd_server_mssql_server_fqdn" {
 output "snapcd_server_mssql_database_name" {
   value = azurerm_mssql_database.this.name
 }
+
+// Empty with bus_type SqlServer.
+output "snapcd_server_servicebus_namespace_endpoint" {
+  value = try("sb://${azurerm_servicebus_namespace.this[0].name}.servicebus.windows.net", "")
+}

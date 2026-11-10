@@ -21,5 +21,6 @@ dns_record_name              = "snapcd"
 # Optional: Snap CD stack secret with the Claude OAuth token for the Agent
 claude_oauth_token_secret_name = ""
 
-# Keep Snap CD's keys and secrets in Azure Key Vault instead of generating them in the app Modules
-key_vault_enabled = false
+
+# Message bus of the Snap CD Server: SqlServer or AzureServiceBus
+snapcd_server_bus_type = "SqlServer"

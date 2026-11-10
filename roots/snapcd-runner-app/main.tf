@@ -1,15 +1,3 @@
-locals {
-  use_akv = var.key_vault_enabled
-}
-
-// Without a Key Vault the SSH key is generated here and handed to the chart; with one, azrandom
-// generates it in snapcd_runner_infra_config.
-resource "tls_private_key" "ssh" {
-  count     = local.use_akv ? 0 : 1
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
 // Connects as the Runner the Server pre-seeds (organization, runner and client ID are the chart's defaults).
 resource "helm_release" "snapcd_runner" {
   name             = var.name
@@ -22,7 +10,6 @@ resource "helm_release" "snapcd_runner" {
   atomic           = true
   timeout          = 600
 
-  // Helm merges these in order: the common values, then either the Key Vault or the local secret.
   values = [yamlencode({
     fullnameOverride = var.name
 
@@ -40,27 +27,7 @@ resource "helm_release" "snapcd_runner" {
         }
       }
     }
-  }), local.use_akv ? local.akv_values_yaml : local.local_values_yaml]
-}
 
-locals {
-  local_values_yaml = yamlencode({
-    config = {
-      appsettings = {
-        RunnerEnvVars = {
-          SNAPCD_CLIENT_SECRET = var.snapcd_runner_client_secret
-        }
-      }
-    }
-    credentials = {
-      clientSecret = var.snapcd_runner_client_secret
-    }
-    ssh = {
-      privateKey = one(tls_private_key.ssh[*].private_key_pem)
-    }
-  })
-
-  akv_values_yaml = yamlencode({
     // The SSH key is a file, which externalsettings.json cannot supply, so the Secrets Store CSI
     // driver mounts it from the Runner's vault with the Runner's workload identity.
     ssh = {
@@ -108,5 +75,5 @@ locals {
         }]
       }
     }
-  })
+  })]
 }

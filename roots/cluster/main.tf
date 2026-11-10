@@ -34,7 +34,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   default_node_pool {
     name                         = "system"
     temporary_name_for_rotation  = "systemtmp" // Without this, a vm_size change replaces the whole cluster rather than rotating the pool
-    only_critical_addons_enabled = true // Setting to "true" will set the "CriticalAddonsOnly=true:NoSchedule" taint, preventing non-system applications from scheduling here
+    only_critical_addons_enabled = true        // Setting to "true" will set the "CriticalAddonsOnly=true:NoSchedule" taint, preventing non-system applications from scheduling here
     orchestrator_version         = var.kubernetes_version
     zones                        = var.zones
     type                         = "VirtualMachineScaleSets"
@@ -47,7 +47,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     max_count                    = var.system_node_pool.max_count
     os_disk_size_gb              = var.system_node_pool.os_disk_size_gb
     vm_size                      = var.system_node_pool.vm_size
-    
+
     upgrade_settings {
       drain_timeout_in_minutes      = 0
       max_surge                     = "10%"
@@ -62,10 +62,10 @@ resource "azurerm_kubernetes_cluster" "this" {
 
 
   network_profile {
-    network_plugin     = "azure"
-    network_policy     = "azure"
-    outbound_type      = "loadBalancer"
-    pod_cidr           = null
+    network_plugin = "azure"
+    network_policy = "azure"
+    outbound_type  = "loadBalancer"
+    pod_cidr       = null
   }
 
 

@@ -36,7 +36,6 @@ resource "azurerm_role_assignment" "akv_secrets_user" {
 
 // Scoped to the one secret, so the Runner cannot read the Server's keys.
 resource "azurerm_role_assignment" "client_secret_user" {
-  count                = var.key_vault_enabled ? 1 : 0
   scope                = "${var.snapcd_server_akv_id}/secrets/${var.snapcd_runner_client_secret_name}"
   role_definition_name = "Key Vault Secrets User"
   principal_id         = module.workload_identity.principal_id

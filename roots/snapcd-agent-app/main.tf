@@ -1,7 +1,3 @@
-locals {
-  use_akv = var.key_vault_enabled
-}
-
 // Connects as the Agent the Server pre-seeds (organization, agent and client ID are the chart's defaults).
 resource "helm_release" "snapcd_agent" {
   name             = var.name
@@ -14,7 +10,6 @@ resource "helm_release" "snapcd_agent" {
   atomic           = true
   timeout          = 600
 
-  // Helm merges these in order: the common values, then either the Key Vault or the local secret.
   values = [yamlencode({
     fullnameOverride = var.name
 
@@ -44,17 +39,7 @@ resource "helm_release" "snapcd_agent" {
         apiKey     = var.claude_api_key
       }
     }
-  }), local.use_akv ? local.akv_values_yaml : local.local_values_yaml]
-}
 
-locals {
-  local_values_yaml = yamlencode({
-    credentials = {
-      clientSecret = var.snapcd_agent_client_secret
-    }
-  })
-
-  akv_values_yaml = yamlencode({
     externalSettings = {
       content = {
         PeriodInSeconds = 300
@@ -69,5 +54,5 @@ locals {
         }]
       }
     }
-  })
+  })]
 }

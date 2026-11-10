@@ -16,11 +16,6 @@ resource "snapcd_module_input_from_literal" "snapcd_server_infra_config" {
       literal_value = var.snapcd_server_name
       type          = "String"
     },
-    {
-      name          = "key_vault_enabled"
-      literal_value = var.key_vault_enabled
-      type          = "NotString"
-    },
   ] : obj.name => obj }
 
   name          = each.value.name

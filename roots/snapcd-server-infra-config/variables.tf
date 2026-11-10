@@ -1,9 +1,6 @@
 variable "name" {
   description = "Name of the Snap CD Server, used for its database user."
 }
-variable "key_vault_enabled" {
-  default = false
-}
 variable "snapcd_server_akv_id" {}
 variable "snapcd_server_akv_url" {}
 variable "snapcd_server_mssql_server_fqdn" {}

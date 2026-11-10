@@ -17,9 +17,9 @@ resource "snapcd_module_input_from_literal" "snapcd_server_app" {
       type          = "String"
     },
     {
-      name          = "key_vault_enabled"
-      literal_value = var.key_vault_enabled
-      type          = "NotString"
+      name          = "bus_type"
+      literal_value = var.snapcd_server_bus_type
+      type          = "String"
     },
     {
       name          = "chart_version"

@@ -26,39 +26,25 @@ variable "admin_email" {
 }
 
 variable "tenant_id" {}
-variable "key_vault_enabled" {
-  description = "Read keys and secrets from the Server's Key Vault. False generates them here."
-  default     = false
-}
 variable "snapcd_server_workload_identity_client_id" {}
 variable "snapcd_server_mssql_server_fqdn" {}
 variable "snapcd_server_mssql_database_name" {}
 
-// Key Vault mode: set by snapcd_server_infra and snapcd_server_infra_config.
-variable "snapcd_server_akv_url" {
-  default = ""
+// From snapcd_server_infra and snapcd_server_infra_config.
+variable "snapcd_server_akv_url" {}
+variable "snapcd_server_token_signing_public_key_pem" {}
+variable "snapcd_server_token_signing_key_reference" {}
+variable "snapcd_server_token_encryption_key_reference" {}
+variable "snapcd_server_state_store_key_reference" {}
+variable "snapcd_server_secret_store_key_reference" {}
+variable "snapcd_server_admin_password_reference" {}
+variable "snapcd_runner_client_secret_reference" {}
+variable "snapcd_agent_client_secret_reference" {}
+variable "bus_type" {
+  description = "SqlServer or AzureServiceBus, matching snapcd_server_infra."
+  default     = "SqlServer"
 }
-variable "snapcd_server_token_signing_public_key_pem" {
-  default = ""
-}
-variable "snapcd_server_token_signing_key_reference" {
-  default = ""
-}
-variable "snapcd_server_token_encryption_key_reference" {
-  default = ""
-}
-variable "snapcd_server_state_store_key_reference" {
-  default = ""
-}
-variable "snapcd_server_secret_store_key_reference" {
-  default = ""
-}
-variable "snapcd_server_admin_password_reference" {
-  default = ""
-}
-variable "snapcd_runner_client_secret_reference" {
-  default = ""
-}
-variable "snapcd_agent_client_secret_reference" {
-  default = ""
+variable "snapcd_server_servicebus_namespace_endpoint" {
+  description = "sb:// address of the Server's Service Bus namespace. Only with bus_type AzureServiceBus."
+  default     = ""
 }

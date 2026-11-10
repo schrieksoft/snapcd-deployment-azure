@@ -52,10 +52,6 @@ variable "claude_oauth_token_secret_name" {
   description = "Name of a Snap CD stack secret holding the Claude OAuth token for the Agent's sidecar. Create the secret by hand first. Empty to leave the sidecar without a credential."
 }
 
-variable "key_vault_enabled" {
-  default     = false
-  description = "Generate Snap CD's keys and secrets into Azure Key Vault with azrandom, read through externalsettings.json and the Secrets Store CSI driver. False generates them in the app Modules instead."
-}
 
 variable "snapcd_server_name" {
   default     = "snapcd-server"
@@ -68,4 +64,13 @@ variable "snapcd_runner_name" {
 variable "snapcd_agent_name" {
   default     = "snapcd-agent"
   description = "Name of the Snap CD Agent: its Kubernetes namespace, release and service account."
+}
+
+variable "snapcd_server_bus_type" {
+  default     = "SqlServer"
+  description = "Message bus of the Snap CD Server: SqlServer (in its database) or AzureServiceBus (a namespace created in snapcd_server_infra)."
+  validation {
+    condition     = contains(["SqlServer", "AzureServiceBus"], var.snapcd_server_bus_type)
+    error_message = "snapcd_server_bus_type must be SqlServer or AzureServiceBus."
+  }
 }

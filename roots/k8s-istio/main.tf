@@ -1,12 +1,12 @@
 module "istio" {
-  source         = "../../modules/kustomization"
-  absolute_paths =  [
+  source = "../../modules/kustomization"
+  absolute_paths = [
     "${path.root}/manifests/istio-base",
     "${path.root}/manifests/istio-discovery",
     "${path.root}/manifests/istio-gateway",
     //"${path.root}/manifests/istio-gateway-private"
   ]
-  patches        = [
+  patches = [
     {
       patch = templatefile("${path.module}/patches/istio-base/namespace.yaml.tftpl", {
         namespace_tolerations   = jsonencode(var.istio_system_namespace_tolerations)
@@ -49,5 +49,5 @@ module "istio" {
     #       private_ip = var.private_gateway_reserved_ip
     #     })
     #   }
-    ]
+  ]
 }

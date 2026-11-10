@@ -17,11 +17,6 @@ resource "snapcd_module_input_from_literal" "snapcd_agent_app" {
       type          = "String"
     },
     {
-      name          = "key_vault_enabled"
-      literal_value = var.key_vault_enabled
-      type          = "NotString"
-    },
-    {
       name          = "chart_version"
       literal_value = local.snapcd_chart_version
       type          = "String"
@@ -55,11 +50,6 @@ resource "snapcd_module_input_from_output" "snapcd_agent_app" {
     {
       name             = "server_url"
       output_name      = "snapcd_server_url_in_cluster"
-      output_module_id = snapcd_module.snapcd_server_app.id
-    },
-    {
-      name             = "snapcd_agent_client_secret"
-      output_name      = "snapcd_agent_client_secret"
       output_module_id = snapcd_module.snapcd_server_app.id
     },
   ] : obj.name => obj }

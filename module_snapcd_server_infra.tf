@@ -16,6 +16,11 @@ resource "snapcd_module_input_from_literal" "snapcd_server_infra" {
       literal_value = var.snapcd_server_name
       type          = "String"
     },
+    {
+      name          = "bus_type"
+      literal_value = var.snapcd_server_bus_type
+      type          = "String"
+    },
   ] : obj.name => obj }
 
   name          = each.value.name

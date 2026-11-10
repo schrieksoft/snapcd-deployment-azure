@@ -1,7 +1,7 @@
 variable "namespace_tolerations" {
-    default = "[]"
+  default = "[]"
 }
 variable "namespace_node_selector" {
-    default = "priority=regular"
+  default = "priority=regular"
 }
 variable "tenant_id" {}

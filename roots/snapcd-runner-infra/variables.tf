@@ -9,11 +9,7 @@ variable "administrator_object_id" {
 }
 variable "cluster_name" {}
 variable "cluster_oidc_issuer_url" {}
-variable "key_vault_enabled" {
-  default = false
-}
 variable "snapcd_server_akv_id" {}
 variable "snapcd_runner_client_secret_name" {
-  description = "Secret in the Server's Key Vault holding the Runner's client secret. Only with key_vault_enabled."
-  default     = ""
+  description = "Secret in the Server's Key Vault holding the Runner's client secret."
 }
