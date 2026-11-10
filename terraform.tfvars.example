@@ -1,0 +1,21 @@
+snapcd_client_id       = ""
+snapcd_client_secret   = ""
+snapcd_organization_id = ""
+
+platform_runner_name = ""
+
+tenant_id               = ""
+subscription_id         = ""
+location                = "eastus2"
+administrator_object_id = ""
+
+# Optional: publish the gateway in an existing Azure DNS zone as <dns_record_name>.<dns_zone_name>
+dns_zone_name                = ""
+dns_zone_resource_group_name = ""
+dns_record_name              = "snapcd"
+
+# Optional: Snap CD stack secret with the Claude OAuth token for the Agent
+claude_oauth_token_secret_name = ""
+
+# Keep Snap CD's keys and secrets in Azure Key Vault instead of generating them in the app Modules
+key_vault_enabled = false

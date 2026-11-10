@@ -1,0 +1,26 @@
+meshConfig:
+  ingressService: istio-gateway
+  ingressSelector: gateway
+  extensionProviders:
+    - name: oauth2-proxy
+      envoyExtAuthzHttp:
+        service: oauth2-proxy.oauth2-proxy.svc.cluster.local
+        port: 80
+        includeRequestHeadersInCheck:
+          - cookie
+          - x-forwarded-access-token
+        headersToUpstreamOnAllow:
+          - authorization
+          - x-auth-request-user
+          - x-auth-request-email
+        headersToDownstreamOnDeny:
+          - content-type
+          - set-cookie
+        includeAdditionalHeadersInCheck:
+          X-Auth-Request-Redirect: https://%REQ(Host)%%REQ(:PATH)%
+# pilot:
+#   tolerations:
+#     - key: CriticalAddonsOnly
+#       operator: Exists
+#   # nodeSelector:
+#   #   agentpool: general

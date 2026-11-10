@@ -1,0 +1,6 @@
+resources:
+  - ../upstream
+  - namespace.yaml
+
+patches:
+  - path: topology-spread.yaml

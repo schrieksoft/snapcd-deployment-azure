@@ -1,0 +1,3 @@
+resources:
+  - generated-public.yaml
+  - namespace.yaml

@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: azure-wi-webhook-controller-manager
+  namespace: azure-workload-identity-system
+spec:
+  template:
+    spec:
+      # failurePolicy is Fail: both replicas on one node means a node drain
+      # rejects every pod CREATE labelled azure.workload.identity/use=true.
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: workload-identity-webhook
+              azure-workload-identity.io/system: "true"
+              chart: workload-identity-webhook
+              release: workload-identity-webhook

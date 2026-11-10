@@ -1,0 +1,64 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfbackend
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+.terraform.lock.hcl
+
+# IDE
+.vscode/
+.idea/
+.vs/
+*.swp
+*~
+
+# OS
+.DS_Store
+
+# .local
+*.local*
+
+# Prevent contributors from committing any local AI coding assistant rules
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+.cursor/
+.cursorrules
+.cursorignore
+.cursorindexingignore
+.specstory/
+.aider*
+.windsurf/
+.windsurfrules
+.codeium/
+.codeiumignore
+.github/copilot/
+.github/copilot-instructions.md
+.continue/
+.continuerc.json
+.cody/
+.sourcegraph/
+.tabnine/
+.tabnine_root
+.cline/
+.clinerules
+.roo/
+.roomodes
+.smol/
+.gpt-pilot/
+.sweep/
+.plandex/
+.goose/
+.amazonq/
+.kilocode/
+.augment/
+AGENTS.md
+.agent/

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: azure-workload-identity-system
+  annotations:
+    scheduler.alpha.kubernetes.io/defaultTolerations: ${namespace_tolerations}
+    scheduler.alpha.kubernetes.io/node-selector: ${namespace_node_selector}

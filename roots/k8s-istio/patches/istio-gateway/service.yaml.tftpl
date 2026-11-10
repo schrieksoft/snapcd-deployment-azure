@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: istio-gateway
+  namespace: istio-gateway
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-resource-group: ${resource_group_name}
+spec:
+  loadBalancerIP: ${public_ip}
