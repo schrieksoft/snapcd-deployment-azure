@@ -27,9 +27,24 @@ resource "snapcd_module_input_from_literal" "snapcd_agent_infra" {
       type          = "String"
     },
     {
+      name          = "claude_credential"
+      literal_value = var.claude_credential
+      type          = "String"
+    },
+    {
+      name          = "anthropic_api_key_secret_name"
+      literal_value = var.anthropic_api_key_secret_name
+      type          = "String"
+    },
+    {
       name          = "claude_oauth_token_secret_name"
       literal_value = var.claude_oauth_token_secret_name
       type          = "String"
+    },
+    {
+      name          = "github_token_enabled"
+      literal_value = var.github_token_enabled
+      type          = "NotString"
     },
     {
       name          = "github_token_secret_name"

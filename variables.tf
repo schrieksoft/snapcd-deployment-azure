@@ -49,19 +49,35 @@ variable "dns_record_name" {
 
 variable "backend_akv_name" {
   default     = ""
-  description = "Existing Key Vault, created and filled by hand, holding credentials such as the Claude token. Empty runs the Agent without its Claude sidecar."
+  description = "Existing Key Vault, created and filled by hand, holding the Agent sidecar's credentials. Needed unless claude_credential is None."
 }
 variable "backend_akv_resource_group_name" {
   default     = ""
   description = "Resource group of backend_akv_name."
 }
+variable "claude_credential" {
+  description = "Claude credential the Agent's sidecar reads from the backend vault: OAuthToken, ApiKey, or None to run the Agent without its sidecar."
+  default     = "None"
+  validation {
+    condition     = contains(["None", "OAuthToken", "ApiKey"], var.claude_credential)
+    error_message = "claude_credential must be None, OAuthToken or ApiKey."
+  }
+}
 variable "claude_oauth_token_secret_name" {
-  default     = "claude-code-oauth-token"
-  description = "Secret in the backend Key Vault holding the Claude subscription token (claude setup-token)."
+  default     = "snapcd-agent-claude-code-oauth-token"
+  description = "Secret in the backend Key Vault holding the Claude subscription token (claude setup-token). Read only with claude_credential OAuthToken."
+}
+variable "anthropic_api_key_secret_name" {
+  default     = "snapcd-agent-anthropic-api-key"
+  description = "Secret in the backend Key Vault holding the Anthropic API key. Read only with claude_credential ApiKey."
+}
+variable "github_token_enabled" {
+  default     = false
+  description = "Whether the Agent's sidecar also reads a GitHub token from the backend Key Vault. Only with a claude_credential."
 }
 variable "github_token_secret_name" {
-  default     = ""
-  description = "Secret in the backend Key Vault holding a GitHub token for the Agent's sidecar. Empty for none."
+  default     = "snapcd-agent-github-token"
+  description = "Secret in the backend Key Vault holding the GitHub token. Read only with github_token_enabled."
 }
 
 

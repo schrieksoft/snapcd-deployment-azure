@@ -15,15 +15,20 @@ resource "azurerm_role_assignment" "client_secret_user" {
   principal_id         = module.workload_identity.principal_id
 }
 
+locals {
+  claude_secret   = { OAuthToken = [var.claude_oauth_token_secret_name], ApiKey = [var.anthropic_api_key_secret_name], None = [] }[var.claude_credential]
+  backend_secrets = length(local.claude_secret) == 0 ? [] : concat(local.claude_secret, var.github_token_enabled ? [var.github_token_secret_name] : [])
+}
+
 data "azurerm_key_vault" "backend" {
-  count               = var.backend_akv_name == "" ? 0 : 1
+  count               = length(local.backend_secrets) == 0 ? 0 : 1
   name                = var.backend_akv_name
   resource_group_name = var.backend_akv_resource_group_name
 }
 
 // Scoped to each credential, so the Agent reads nothing else in the backend vault.
 resource "azurerm_role_assignment" "backend_secret_user" {
-  for_each             = var.backend_akv_name == "" ? toset([]) : toset(compact([var.claude_oauth_token_secret_name, var.github_token_secret_name]))
+  for_each             = toset(local.backend_secrets)
   scope                = "${data.azurerm_key_vault.backend[0].id}/secrets/${each.value}"
   role_definition_name = "Key Vault Secrets User"
   principal_id         = module.workload_identity.principal_id

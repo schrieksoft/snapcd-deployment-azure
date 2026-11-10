@@ -18,11 +18,14 @@ dns_zone_name                = ""
 dns_zone_resource_group_name = ""
 dns_record_name              = "snapcd"
 
-# Optional: existing Key Vault holding the Agent sidecar's credentials, put in by hand
+# Optional: the Agent sidecar's credentials, in an existing Key Vault filled by hand
 backend_akv_name                = ""
 backend_akv_resource_group_name = ""
-claude_oauth_token_secret_name  = "claude-code-oauth-token"
-github_token_secret_name        = ""
+claude_credential               = "None" # None, OAuthToken or ApiKey
+claude_oauth_token_secret_name  = "snapcd-agent-claude-code-oauth-token"
+anthropic_api_key_secret_name   = "snapcd-agent-anthropic-api-key"
+github_token_enabled            = false
+github_token_secret_name        = "snapcd-agent-github-token"
 
 
 # Message bus of the Snap CD Server: SqlServer or AzureServiceBus

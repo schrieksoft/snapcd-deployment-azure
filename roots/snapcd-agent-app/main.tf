@@ -1,6 +1,8 @@
 locals {
-  sidecar          = var.backend_akv_name != ""
-  credentials_path = "/mnt/credentials"
+  claude_secret   = { OAuthToken = [var.claude_oauth_token_secret_name], ApiKey = [var.anthropic_api_key_secret_name], None = [] }[var.claude_credential]
+  backend_secrets = length(local.claude_secret) == 0 ? [] : concat(local.claude_secret, var.github_token_enabled ? [var.github_token_secret_name] : [])
+  sidecar         = var.claude_credential != "None"
+  credentials     = "/mnt/credentials"
 }
 
 // Connects as the Agent the Server pre-seeds (organization, agent and client ID are the chart's defaults).
@@ -41,8 +43,9 @@ resource "helm_release" "snapcd_agent" {
       enabled = local.sidecar
       credentials = {
         files = {
-          oauthToken  = "${local.credentials_path}/${var.claude_oauth_token_secret_name}"
-          githubToken = var.github_token_secret_name == "" ? "" : "${local.credentials_path}/${var.github_token_secret_name}"
+          oauthToken  = var.claude_credential == "OAuthToken" ? "${local.credentials}/${var.claude_oauth_token_secret_name}" : ""
+          apiKey      = var.claude_credential == "ApiKey" ? "${local.credentials}/${var.anthropic_api_key_secret_name}" : ""
+          githubToken = var.github_token_enabled ? "${local.credentials}/${var.github_token_secret_name}" : ""
         }
       }
       extraVolumes = [{
@@ -55,7 +58,7 @@ resource "helm_release" "snapcd_agent" {
       }]
       extraVolumeMounts = [{
         name      = "credentials"
-        mountPath = local.credentials_path
+        mountPath = local.credentials
         readOnly  = true
       }]
     }
@@ -72,7 +75,7 @@ resource "helm_release" "snapcd_agent" {
           keyvaultName   = var.backend_akv_name
           tenantId       = var.tenant_id
           objects = yamlencode({
-            array = [for n in compact([var.claude_oauth_token_secret_name, var.github_token_secret_name]) : yamlencode({
+            array = [for n in local.backend_secrets : yamlencode({
               objectName = n
               objectType = "secret"
             })]
