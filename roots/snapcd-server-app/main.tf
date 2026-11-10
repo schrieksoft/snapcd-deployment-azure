@@ -91,6 +91,14 @@ resource "helm_release" "snapcd_server" {
         Server = {
           Host = "https://${var.public_hostname}"
         }
+        // SqlClient reads User ID as the client ID for Active Directory Default, and the transport names its database user by it.
+        ServiceBus = {
+          TransportOptions = {
+            SqlServer = {
+              Username = var.snapcd_server_workload_identity_client_id
+            }
+          }
+        }
         ProductionDataSeeder = {
           Preseeded = {
             Enabled = true

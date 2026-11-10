@@ -15,8 +15,9 @@ data "mssql_database_role" "db_owner" {
   database_id = data.mssql_database.this.id
 }
 
+// Named by client ID, which the Server's SQL transport passes as its Username.
 resource "mssql_azuread_service_principal" "this" {
-  name        = var.name
+  name        = var.snapcd_server_workload_identity_client_id
   database_id = data.mssql_database.this.id
   client_id   = var.snapcd_server_workload_identity_client_id
 }
