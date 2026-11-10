@@ -14,3 +14,17 @@ resource "azurerm_role_assignment" "client_secret_user" {
   role_definition_name = "Key Vault Secrets User"
   principal_id         = module.workload_identity.principal_id
 }
+
+data "azurerm_key_vault" "backend" {
+  count               = var.backend_akv_name == "" ? 0 : 1
+  name                = var.backend_akv_name
+  resource_group_name = var.backend_akv_resource_group_name
+}
+
+// Scoped to each credential, so the Agent reads nothing else in the backend vault.
+resource "azurerm_role_assignment" "backend_secret_user" {
+  for_each             = var.backend_akv_name == "" ? toset([]) : toset(compact([var.claude_oauth_token_secret_name, var.github_token_secret_name]))
+  scope                = "${data.azurerm_key_vault.backend[0].id}/secrets/${each.value}"
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = module.workload_identity.principal_id
+}

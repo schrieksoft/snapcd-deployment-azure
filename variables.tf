@@ -47,9 +47,21 @@ variable "dns_record_name" {
   description = "Record created in dns_zone_name for the gateway."
 }
 
-variable "claude_oauth_token_secret_name" {
+variable "backend_akv_name" {
   default     = ""
-  description = "Name of a Snap CD stack secret holding the Claude OAuth token for the Agent's sidecar. Create the secret by hand first. Empty to leave the sidecar without a credential."
+  description = "Existing Key Vault, created and filled by hand, holding credentials such as the Claude token. Empty runs the Agent without its Claude sidecar."
+}
+variable "backend_akv_resource_group_name" {
+  default     = ""
+  description = "Resource group of backend_akv_name."
+}
+variable "claude_oauth_token_secret_name" {
+  default     = "claude-code-oauth-token"
+  description = "Secret in the backend Key Vault holding the Claude subscription token (claude setup-token)."
+}
+variable "github_token_secret_name" {
+  default     = ""
+  description = "Secret in the backend Key Vault holding a GitHub token for the Agent's sidecar. Empty for none."
 }
 
 

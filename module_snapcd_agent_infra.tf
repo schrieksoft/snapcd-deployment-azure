@@ -16,6 +16,26 @@ resource "snapcd_module_input_from_literal" "snapcd_agent_infra" {
       literal_value = var.snapcd_agent_name
       type          = "String"
     },
+    {
+      name          = "backend_akv_name"
+      literal_value = var.backend_akv_name
+      type          = "String"
+    },
+    {
+      name          = "backend_akv_resource_group_name"
+      literal_value = var.backend_akv_resource_group_name
+      type          = "String"
+    },
+    {
+      name          = "claude_oauth_token_secret_name"
+      literal_value = var.claude_oauth_token_secret_name
+      type          = "String"
+    },
+    {
+      name          = "github_token_secret_name"
+      literal_value = var.github_token_secret_name
+      type          = "String"
+    },
   ] : obj.name => obj }
 
   name          = each.value.name

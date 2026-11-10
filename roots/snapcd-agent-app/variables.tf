@@ -16,14 +16,15 @@ variable "name" {
 variable "server_url" {
   description = "Server URL as the Agent reaches it inside the cluster."
 }
-variable "claude_oauth_token" {
-  description = "Claude credential for the Agent's sidecar. Set this or claude_api_key."
+variable "backend_akv_name" {
+  description = "Existing Key Vault holding the sidecar's credentials. Empty runs the Agent without its sidecar."
   default     = ""
-  sensitive   = true
 }
-variable "claude_api_key" {
-  default   = ""
-  sensitive = true
+variable "claude_oauth_token_secret_name" {
+  default = "claude-code-oauth-token"
+}
+variable "github_token_secret_name" {
+  default = ""
 }
 
 variable "tenant_id" {}

@@ -18,8 +18,11 @@ dns_zone_name                = ""
 dns_zone_resource_group_name = ""
 dns_record_name              = "snapcd"
 
-# Optional: Snap CD stack secret with the Claude OAuth token for the Agent
-claude_oauth_token_secret_name = ""
+# Optional: existing Key Vault holding the Agent sidecar's credentials, put in by hand
+backend_akv_name                = ""
+backend_akv_resource_group_name = ""
+claude_oauth_token_secret_name  = "claude-code-oauth-token"
+github_token_secret_name        = ""
 
 
 # Message bus of the Snap CD Server: SqlServer or AzureServiceBus

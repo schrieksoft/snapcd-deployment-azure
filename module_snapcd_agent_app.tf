@@ -17,6 +17,21 @@ resource "snapcd_module_input_from_literal" "snapcd_agent_app" {
       type          = "String"
     },
     {
+      name          = "backend_akv_name"
+      literal_value = var.backend_akv_name
+      type          = "String"
+    },
+    {
+      name          = "claude_oauth_token_secret_name"
+      literal_value = var.claude_oauth_token_secret_name
+      type          = "String"
+    },
+    {
+      name          = "github_token_secret_name"
+      literal_value = var.github_token_secret_name
+      type          = "String"
+    },
+    {
       name          = "chart_version"
       literal_value = local.snapcd_chart_version
       type          = "String"
@@ -81,18 +96,4 @@ resource "snapcd_module_input_from_output_set" "snapcd_agent_app" {
   output_module_id = each.value.output_module_id
   input_kind       = "Param"
   module_id        = snapcd_module.snapcd_agent_app.id
-}
-
-data "snapcd_stack_secret" "claude_oauth_token" {
-  count    = var.claude_oauth_token_secret_name == "" ? 0 : 1
-  name     = var.claude_oauth_token_secret_name
-  stack_id = snapcd_stack.bootstrap.id
-}
-
-resource "snapcd_module_input_from_secret" "snapcd_agent_app_claude_oauth_token" {
-  count      = var.claude_oauth_token_secret_name == "" ? 0 : 1
-  name       = "claude_oauth_token"
-  secret_id  = data.snapcd_stack_secret.claude_oauth_token[0].id
-  input_kind = "Param"
-  module_id  = snapcd_module.snapcd_agent_app.id
 }

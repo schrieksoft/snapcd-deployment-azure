@@ -1,3 +1,8 @@
+locals {
+  sidecar          = var.backend_akv_name != ""
+  credentials_path = "/mnt/credentials"
+}
+
 // Connects as the Agent the Server pre-seeds (organization, agent and client ID are the chart's defaults).
 resource "helm_release" "snapcd_agent" {
   name             = var.name
@@ -31,14 +36,50 @@ resource "helm_release" "snapcd_agent" {
       }
     }
 
-    // The chart refuses a sidecar with no Claude credential; without one the Agent runs without it.
+    // The sidecar reads its credentials from files the Secrets Store CSI driver mounts from the backend vault.
     sidecar = {
-      enabled = var.claude_oauth_token != "" || var.claude_api_key != ""
+      enabled = local.sidecar
       credentials = {
-        oauthToken = var.claude_oauth_token
-        apiKey     = var.claude_api_key
+        files = {
+          oauthToken  = "${local.credentials_path}/${var.claude_oauth_token_secret_name}"
+          githubToken = var.github_token_secret_name == "" ? "" : "${local.credentials_path}/${var.github_token_secret_name}"
+        }
       }
+      extraVolumes = [{
+        name = "credentials"
+        csi = {
+          driver           = "secrets-store.csi.k8s.io"
+          readOnly         = true
+          volumeAttributes = { secretProviderClass = "${var.name}-credentials" }
+        }
+      }]
+      extraVolumeMounts = [{
+        name      = "credentials"
+        mountPath = local.credentials_path
+        readOnly  = true
+      }]
     }
+
+    extraManifests = local.sidecar ? [{
+      apiVersion = "secrets-store.csi.x-k8s.io/v1"
+      kind       = "SecretProviderClass"
+      metadata   = { name = "${var.name}-credentials", namespace = var.name }
+      spec = {
+        provider = "azure"
+        parameters = {
+          usePodIdentity = "false"
+          clientID       = var.snapcd_agent_workload_identity_client_id
+          keyvaultName   = var.backend_akv_name
+          tenantId       = var.tenant_id
+          objects = yamlencode({
+            array = [for n in compact([var.claude_oauth_token_secret_name, var.github_token_secret_name]) : yamlencode({
+              objectName = n
+              objectType = "secret"
+            })]
+          })
+        }
+      }
+    }] : []
 
     externalSettings = {
       content = {
