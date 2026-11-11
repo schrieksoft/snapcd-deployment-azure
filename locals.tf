@@ -5,7 +5,7 @@ locals {
   public_gateway_domain_name_label = "snapcd"
 
   // Charts from oci://ghcr.io/schrieksoft/charts, used for the Server, Runner and Agent.
-  snapcd_chart_version = "0.1.19"
+  snapcd_chart_version = "0.1.20"
 
   before_hook_base = <<EOT
 EOT
