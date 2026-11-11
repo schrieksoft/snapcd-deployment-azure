@@ -8,6 +8,8 @@ resource "random_string" "dns_label_suffix" {
 
 locals {
   domain_name_label = var.public_dns_label_random_suffix ? "${var.public_dns_label}-${random_string.dns_label_suffix[0].result}" : var.public_dns_label
+  // azurerm plans the public IP's fqdn as unchanged when its label changes, so the name is built here.
+  public_gateway_fqdn = "${local.domain_name_label}.${var.location}.cloudapp.azure.com"
 }
 
 resource "azurerm_public_ip" "public_gateway" {

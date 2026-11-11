@@ -1,5 +1,11 @@
 variable "resource_group_name" {}
-variable "location" {}
+variable "location" {
+  description = "Azure region in its short form, as az account list-locations shows it in the name column, for example eastus2."
+  validation {
+    condition     = can(regex("^[a-z][a-z0-9]+$", var.location))
+    error_message = "location must be the short form of the Azure region, for example eastus2 or westeurope, not a display name such as East US 2."
+  }
+}
 variable "ingress_subnet_id" {}
 variable "private_gateway_reserved_ip" {}
 variable "public_dns_label" {

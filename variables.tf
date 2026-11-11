@@ -29,7 +29,13 @@ variable "name" {
 
 variable "tenant_id" {}
 variable "subscription_id" {}
-variable "location" {}
+variable "location" {
+  description = "Azure region in its short form, as az account list-locations shows it in the name column, for example eastus2."
+  validation {
+    condition     = can(regex("^[a-z][a-z0-9]+$", var.location))
+    error_message = "location must be the short form of the Azure region, for example eastus2 or westeurope, not a display name such as East US 2."
+  }
+}
 variable "administrator_object_id" {
   description = "Entra group or user that administers the AKS cluster."
 }
