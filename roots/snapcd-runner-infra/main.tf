@@ -34,13 +34,6 @@ resource "azurerm_role_assignment" "akv_secrets_user" {
   principal_id         = module.workload_identity.principal_id
 }
 
-// Scoped to the one secret, so the Runner cannot read the Server's keys.
-resource "azurerm_role_assignment" "client_secret_user" {
-  scope                = "${var.snapcd_server_akv_id}/secrets/${var.snapcd_runner_client_secret_name}"
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = module.workload_identity.principal_id
-}
-
 // Key Vault data-plane role assignments take a few minutes to apply.
 resource "time_sleep" "role_propagation" {
   depends_on      = [module.akv, azurerm_role_assignment.akv_secrets_user]

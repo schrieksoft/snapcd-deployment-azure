@@ -1,4 +1,5 @@
-// Connects as the Runner the Server pre-seeds (organization, runner and client ID are the chart's defaults).
+// Connects as the Runner the Server pre-seeds (organization, runner and client ID are the chart's defaults),
+// with its projected ServiceAccount token, which matches the Federated Credential the Server seeds.
 resource "helm_release" "snapcd_runner" {
   name             = var.name
   namespace        = var.name
@@ -18,6 +19,10 @@ resource "helm_release" "snapcd_runner" {
         clientId = var.snapcd_runner_workload_identity_client_id
         tenantId = var.tenant_id
       }
+    }
+
+    credentials = {
+      mode = "Federated"
     }
 
     config = {
@@ -60,20 +65,5 @@ resource "helm_release" "snapcd_runner" {
         }
       }
     }]
-    externalSettings = {
-      content = {
-        PeriodInSeconds = 300
-        DueTimeSeconds  = 300
-        ReloadEnabled   = true
-        Providers = [{
-          Loader        = "AzureKeyVault"
-          Configuration = { VaultUrl = var.snapcd_server_akv_url }
-          Data = {
-            Runner        = { Credentials = { ClientSecret = var.snapcd_runner_client_secret_reference } }
-            RunnerEnvVars = { SNAPCD_CLIENT_SECRET = var.snapcd_runner_client_secret_reference }
-          }
-        }]
-      }
-    }
   })]
 }

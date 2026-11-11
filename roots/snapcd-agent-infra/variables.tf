@@ -5,10 +5,6 @@ variable "resource_group_name" {}
 variable "location" {}
 variable "cluster_name" {}
 variable "cluster_oidc_issuer_url" {}
-variable "snapcd_server_akv_id" {}
-variable "snapcd_agent_client_secret_name" {
-  description = "Secret in the Server's Key Vault holding the Agent's client secret."
-}
 variable "backend_akv_name" {
   description = "Existing Key Vault holding credentials put in by hand. Empty for none."
   default     = ""

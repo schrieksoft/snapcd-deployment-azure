@@ -42,5 +42,3 @@ variable "tenant_id" {}
 variable "snapcd_agent_workload_identity_client_id" {}
 
 // From snapcd_server_infra, snapcd_server_infra_config and snapcd_agent_infra.
-variable "snapcd_server_akv_url" {}
-variable "snapcd_agent_client_secret_reference" {}

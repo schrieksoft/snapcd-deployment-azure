@@ -39,7 +39,15 @@ variable "snapcd_server_state_store_key_reference" {}
 variable "snapcd_server_secret_store_key_reference" {}
 variable "snapcd_server_admin_password_reference" {}
 variable "snapcd_runner_client_secret_reference" {}
-variable "snapcd_agent_client_secret_reference" {}
+variable "cluster_oidc_issuer_url" {
+  description = "Issuer of the cluster's ServiceAccount tokens, which the Runner and the Agent authenticate with."
+}
+variable "runner_name" {
+  description = "Kubernetes namespace and ServiceAccount of the Runner."
+}
+variable "agent_name" {
+  description = "Kubernetes namespace and ServiceAccount of the Agent."
+}
 variable "bus_type" {
   description = "SqlServer or AzureServiceBus, matching snapcd_server_infra."
   default     = "SqlServer"

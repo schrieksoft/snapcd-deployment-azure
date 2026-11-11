@@ -5,7 +5,8 @@ locals {
   credentials     = "/mnt/credentials"
 }
 
-// Connects as the Agent the Server pre-seeds (organization, agent and client ID are the chart's defaults).
+// Connects as the Agent the Server pre-seeds (organization, agent and client ID are the chart's defaults),
+// with its projected ServiceAccount token, which matches the Federated Credential the Server seeds.
 resource "helm_release" "snapcd_agent" {
   name             = var.name
   namespace        = var.name
@@ -28,6 +29,10 @@ resource "helm_release" "snapcd_agent" {
     }
     podLabels = {
       "azure.workload.identity/use" = "true"
+    }
+
+    credentials = {
+      mode = "Federated"
     }
 
     config = {
@@ -84,19 +89,5 @@ resource "helm_release" "snapcd_agent" {
       }
     }] : []
 
-    externalSettings = {
-      content = {
-        PeriodInSeconds = 300
-        DueTimeSeconds  = 300
-        ReloadEnabled   = true
-        Providers = [{
-          Loader        = "AzureKeyVault"
-          Configuration = { VaultUrl = var.snapcd_server_akv_url }
-          Data = {
-            Agent = { ClientSecret = var.snapcd_agent_client_secret_reference }
-          }
-        }]
-      }
-    }
   })]
 }

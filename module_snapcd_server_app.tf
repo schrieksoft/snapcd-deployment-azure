@@ -26,6 +26,16 @@ resource "snapcd_module_input_from_literal" "snapcd_server_app" {
       literal_value = local.snapcd_chart_version
       type          = "String"
     },
+    {
+      name          = "runner_name"
+      literal_value = var.snapcd_runner_name
+      type          = "String"
+    },
+    {
+      name          = "agent_name"
+      literal_value = var.snapcd_agent_name
+      type          = "String"
+    },
   ] : obj.name => obj }
 
   name          = each.value.name
@@ -56,6 +66,11 @@ resource "snapcd_module_input_from_output" "snapcd_server_app" {
       name             = "public_hostname"
       output_name      = "public_hostname"
       output_module_id = snapcd_module.istio_infra.id
+    },
+    {
+      name             = "cluster_oidc_issuer_url"
+      output_name      = "cluster_oidc_issuer_url"
+      output_module_id = snapcd_module.cluster.id
     },
   ] : obj.name => obj }
 

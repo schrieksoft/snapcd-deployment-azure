@@ -38,7 +38,9 @@ Each Module reads its code from `roots/<name>` on the `main` branch of this repo
 | `snapcd_agent_infra` | `roots/snapcd-agent-infra` | The Agent workload identity, and its access to the backend Key Vault secrets |
 | `snapcd_agent_app` | `roots/snapcd-agent-app` | The `snapcd-agent` chart, and the Claude sidecar when a Claude credential is set |
 
-All keys, passwords and client secrets go into Key Vault. The `azrandom` provider generates most of them directly in the Key Vault, so their values are not in the Terraform state. The Server, Runner and Agent read them through `externalsettings.json` and their workload identities. The Runner SSH key and the Agent credentials are files. The Secrets Store CSI driver mounts these files from Key Vault.
+All keys, passwords and client secrets go into Key Vault. The `azrandom` provider generates most of them directly in the Key Vault, so their values are not in the Terraform state. The Server reads them through `externalsettings.json` and its workload identity. The Runner SSH key and the Agent credentials are files. The Secrets Store CSI driver mounts these files from Key Vault.
+
+The Runner and the Agent do not use client secrets. Each one signs in to the Server with its projected ServiceAccount token. The Server seeds a Federated Credential for each one, with the AKS OIDC issuer and the ServiceAccount as the subject. The Runner jobs use the same token for the Snap CD provider and for the State Store. The `default` Service Principal keeps its client secret in the Server Key Vault, as `snapcd-runner-client-secret`. Use it to apply a configuration to the Server from your machine.
 
 ## Prerequisites
 

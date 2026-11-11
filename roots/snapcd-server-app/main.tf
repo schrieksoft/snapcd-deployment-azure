@@ -68,10 +68,27 @@ resource "helm_release" "snapcd_server" {
             RsaPublicKey = var.snapcd_server_token_signing_public_key_pem
           }
         }
+        // The Runner and the Agent authenticate with their projected ServiceAccount tokens. The Runner
+        // keeps its client secret, for applying a configuration by hand as the "default" Service Principal.
         ProductionDataSeeder = {
           Preseeded = {
             Enabled = true
             User    = { Email = var.admin_email }
+            Runner = {
+              FederatedCredentials = [{
+                Name    = "aks"
+                Issuer  = var.cluster_oidc_issuer_url
+                Subject = "system:serviceaccount:${var.runner_name}:${var.runner_name}"
+              }]
+            }
+            Agent = {
+              ServicePrincipalClientSecret = ""
+              FederatedCredentials = [{
+                Name    = "aks"
+                Issuer  = var.cluster_oidc_issuer_url
+                Subject = "system:serviceaccount:${var.agent_name}:${var.agent_name}"
+              }]
+            }
           }
         }
       }
@@ -97,7 +114,6 @@ resource "helm_release" "snapcd_server" {
               Preseeded = {
                 User   = { Password = var.snapcd_server_admin_password_reference }
                 Runner = { ServicePrincipalClientSecret = var.snapcd_runner_client_secret_reference }
-                Agent  = { ServicePrincipalClientSecret = var.snapcd_agent_client_secret_reference }
               }
             }
           }

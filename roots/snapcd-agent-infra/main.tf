@@ -8,13 +8,6 @@ module "workload_identity" {
   service_account         = var.name
 }
 
-// Scoped to the one secret, so the Agent cannot read the Server's keys.
-resource "azurerm_role_assignment" "client_secret_user" {
-  scope                = "${var.snapcd_server_akv_id}/secrets/${var.snapcd_agent_client_secret_name}"
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = module.workload_identity.principal_id
-}
-
 locals {
   claude_secret   = { OAuthToken = [var.claude_oauth_token_secret_name], ApiKey = [var.anthropic_api_key_secret_name], None = [] }[var.claude_credential]
   backend_secrets = length(local.claude_secret) == 0 ? [] : concat(local.claude_secret, var.github_token_enabled ? [var.github_token_secret_name] : [])

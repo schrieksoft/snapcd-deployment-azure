@@ -72,16 +72,6 @@ resource "snapcd_module_input_from_output" "snapcd_agent_infra" {
       output_name      = "cluster_oidc_issuer_url"
       output_module_id = snapcd_module.cluster.id
     },
-    {
-      name             = "snapcd_server_akv_id"
-      output_name      = "snapcd_server_akv_id"
-      output_module_id = snapcd_module.snapcd_server_infra.id
-    },
-    {
-      name             = "snapcd_agent_client_secret_name"
-      output_name      = "snapcd_agent_client_secret_name"
-      output_module_id = snapcd_module.snapcd_server_infra_config.id
-    },
   ] : obj.name => obj }
 
   name             = each.value.name
