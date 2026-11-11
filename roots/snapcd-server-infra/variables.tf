@@ -13,7 +13,7 @@ variable "apps_subnet_id" {
   description = "Subnet the Server's pods run in, allowed through the SQL server's firewall."
 }
 variable "sql_database_sku" {
-  default = "Basic"
+  default = "S1"
 }
 variable "sql_database_max_size_gb" {
   default = 2

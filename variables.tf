@@ -113,6 +113,11 @@ variable "snapcd_agent_name" {
   description = "Name of the Snap CD Agent: its Kubernetes namespace, release and service account."
 }
 
+variable "snapcd_server_sql_database_sku" {
+  default     = "S1"
+  description = "Service objective of the Server's Azure SQL database, for example S1 (20 DTU) or S2 (50 DTU). Basic (5 DTU) is too small for a Server with running jobs."
+}
+
 variable "snapcd_server_bus_type" {
   default     = "AzureServiceBus"
   description = "Message bus of the Snap CD Server: AzureServiceBus (a namespace created in snapcd_server_infra) or SqlServer (in its database)."

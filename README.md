@@ -152,6 +152,10 @@ The label is unique in an Azure region. So by default, `istio_infra` adds a hyph
 
 To also publish the gateway in an Azure DNS zone that you own, set `dns_zone_name` and `dns_zone_resource_group_name`. `dns_record_name` sets the record name. The default is `snapcd`. The zone must exist before you apply.
 
+### Database size
+
+`snapcd_server_sql_database_sku` sets the service objective of the Server's Azure SQL database. The default is `S1` (20 DTU). Use `S2` (50 DTU) or larger for many Modules or many users. Do not use `Basic` (5 DTU): with jobs running, the Server's queries time out and the Dashboard becomes slow.
+
 ### Message bus
 
 `snapcd_server_bus_type` sets the message bus of the Server.
