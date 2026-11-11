@@ -34,6 +34,19 @@ variable "administrator_object_id" {
   description = "Entra group or user that administers the AKS cluster."
 }
 
+variable "public_dns_label" {
+  default     = null
+  description = "Azure DNS label of the gateway, which makes the Server <label>.<region>.cloudapp.azure.com. With public_dns_label_random_suffix, the prefix of the label. Defaults to name."
+  validation {
+    condition     = var.public_dns_label == null || can(regex("^[a-z][a-z0-9-]{0,54}[a-z0-9]$", var.public_dns_label))
+    error_message = "public_dns_label must start with a letter, end with a letter or a digit, and hold only lower-case letters, digits and hyphens: 2 to 56 characters."
+  }
+}
+variable "public_dns_label_random_suffix" {
+  default     = true
+  description = "Add a hyphen and five random characters to public_dns_label. Labels are unique per Azure region, so this keeps two deployments from colliding."
+}
+
 variable "dns_zone_name" {
   default     = ""
   description = "Existing Azure DNS zone to publish the gateway in, e.g. example.com. Empty to use only <label>.<region>.cloudapp.azure.com."
@@ -95,8 +108,8 @@ variable "snapcd_agent_name" {
 }
 
 variable "snapcd_server_bus_type" {
-  default     = "SqlServer"
-  description = "Message bus of the Snap CD Server: SqlServer (in its database) or AzureServiceBus (a namespace created in snapcd_server_infra)."
+  default     = "AzureServiceBus"
+  description = "Message bus of the Snap CD Server: AzureServiceBus (a namespace created in snapcd_server_infra) or SqlServer (in its database)."
   validation {
     condition     = contains(["SqlServer", "AzureServiceBus"], var.snapcd_server_bus_type)
     error_message = "snapcd_server_bus_type must be SqlServer or AzureServiceBus."

@@ -82,6 +82,8 @@ With `.env.prod`, the bootstrap Server is at `http://localhost:7000`. The Runner
 | `bootstrap_stack_name` | `bootstrap` | The stack on the bootstrap that holds this deployment |
 | `bootstrap_namespace_name` | `azure` | The namespace on the bootstrap that holds the Modules |
 | `name` | `snapcd` | The name of the resource group, the virtual network and the AKS cluster |
+| `public_dns_label` | `name` | The Azure DNS label of the Server: `<label>.<location>.cloudapp.azure.com` |
+| `public_dns_label_random_suffix` | `true` | Adds a hyphen and five random characters to the label. See "DNS" |
 | `snapcd_server_name` | `snapcd-server` | The Kubernetes namespace and release of the Server, and the prefix of its Azure resources |
 | `snapcd_runner_name` | `snapcd-runner` | The same for the Runner |
 | `snapcd_agent_name` | `snapcd-agent` | The same for the Agent |
@@ -112,7 +114,7 @@ The first run takes some time:
 
 ### Open the Dashboard
 
-The Server is at `https://snapcd.<location>.cloudapp.azure.com`. The `url` output of `snapcd_server_app` shows the address. If you set an Azure DNS zone, the Server is also at `<dns_record_name>.<dns_zone_name>`.
+The Server is at `https://<label>.<location>.cloudapp.azure.com`. By default, the label is `name` and five random characters, for example `platform-k3x9q`. The `url` output of `snapcd_server_app` shows the address. If you set an Azure DNS zone, the Server is also at `<dns_record_name>.<dns_zone_name>`.
 
 ### Sign in
 
@@ -144,7 +146,9 @@ The `snapcd_runner_ssh_public_key_openssh` output of `snapcd_runner_infra_config
 
 ### DNS
 
-By default, the Server uses the Azure DNS label of the gateway IP address: `snapcd.<location>.cloudapp.azure.com`. Let's Encrypt issues the certificate for this name.
+By default, the Server uses the Azure DNS label of the gateway IP address: `<label>.<location>.cloudapp.azure.com`. Let's Encrypt issues the certificate for this name.
+
+The label is unique in an Azure region. So by default, `istio_infra` adds a hyphen and five random characters to the label, for example `platform-k3x9q`. The label is `public_dns_label`, or `name` when you do not set it. It generates the characters one time and keeps them in its state, so the address does not change when you apply again. To use the label exactly, set `public_dns_label_random_suffix = false`. The label must then be free in the region.
 
 To also publish the gateway in an Azure DNS zone that you own, set `dns_zone_name` and `dns_zone_resource_group_name`. `dns_record_name` sets the record name. The default is `snapcd`. The zone must exist before you apply.
 
@@ -152,8 +156,8 @@ To also publish the gateway in an Azure DNS zone that you own, set `dns_zone_nam
 
 `snapcd_server_bus_type` sets the message bus of the Server.
 
-- `SqlServer` (default): the bus uses the Server database.
-- `AzureServiceBus`: `snapcd_server_infra` creates a Standard Service Bus namespace. The Server workload identity gets the Azure Service Bus Data Owner role on it.
+- `AzureServiceBus` (default): `snapcd_server_infra` creates a Standard Service Bus namespace. The Server workload identity gets the Azure Service Bus Data Owner role on it.
+- `SqlServer`: the bus uses the Server database. No Service Bus namespace is created.
 
 ### Agent credentials
 

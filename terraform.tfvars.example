@@ -13,6 +13,11 @@ subscription_id         = ""
 location                = "eastus2"
 administrator_object_id = ""
 
+# The Server is at <label>.<location>.cloudapp.azure.com. By default the label is name plus five
+# random characters, for example platform-k3x9q. public_dns_label replaces name in the label.
+# public_dns_label               = ""
+public_dns_label_random_suffix = true
+
 # Optional: publish the gateway in an existing Azure DNS zone as <dns_record_name>.<dns_zone_name>
 dns_zone_name                = ""
 dns_zone_resource_group_name = ""
@@ -28,5 +33,5 @@ github_token_enabled            = false
 github_token_secret_name        = "snapcd-agent-github-token"
 
 
-# Message bus of the Snap CD Server: SqlServer or AzureServiceBus
-snapcd_server_bus_type = "SqlServer"
+# Message bus of the Snap CD Server: AzureServiceBus or SqlServer
+snapcd_server_bus_type = "AzureServiceBus"

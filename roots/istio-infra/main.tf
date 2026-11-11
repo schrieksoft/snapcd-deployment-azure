@@ -1,3 +1,14 @@
+// Generated once and kept in state, so the hostname stays the same across applies.
+resource "random_string" "dns_label_suffix" {
+  count   = var.public_dns_label_random_suffix ? 1 : 0
+  length  = 5
+  upper   = false
+  special = false
+}
+
+locals {
+  domain_name_label = var.public_dns_label_random_suffix ? "${var.public_dns_label}-${random_string.dns_label_suffix[0].result}" : var.public_dns_label
+}
 
 resource "azurerm_public_ip" "public_gateway" {
   name                = "istio-public-gateway"
@@ -5,7 +16,7 @@ resource "azurerm_public_ip" "public_gateway" {
   resource_group_name = var.resource_group_name
   allocation_method   = "Static"
   sku                 = "Standard"
-  domain_name_label   = var.public_gateway_domain_name_label
+  domain_name_label   = local.domain_name_label
 }
 
 data "azurerm_dns_zone" "this" {

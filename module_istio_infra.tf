@@ -19,9 +19,14 @@ resource "snapcd_module_input_from_literal" "istio_infra" {
 
     },
     {
-      name          = "public_gateway_domain_name_label"
-      literal_value = local.public_gateway_domain_name_label
+      name          = "public_dns_label"
+      literal_value = coalesce(var.public_dns_label, var.name)
       type          = "String"
+    },
+    {
+      name          = "public_dns_label_random_suffix"
+      literal_value = var.public_dns_label_random_suffix
+      type          = "NotString"
     },
     {
       name          = "dns_zone_name"
