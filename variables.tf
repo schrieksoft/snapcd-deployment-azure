@@ -1,5 +1,5 @@
 variable "bootstrap_snapcd_url" {
-  default     = "http://localhost:7000"
+  default     = "http://localhost:5000"
   description = "The bootstrap Snap CD Server that deploys this configuration, as this machine reaches it."
 }
 variable "bootstrap_snapcd_client_id" {}

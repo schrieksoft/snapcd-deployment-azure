@@ -57,14 +57,14 @@ The bootstrap Runner signs in to Azure with the Azure CLI. Its home directory is
 1. In `serving/snapcd-deployment-docker`, start the stack and sign the Runner in to Azure:
 
    ```bash
-   docker compose --env-file .env.prod up -d && docker compose --env-file .env.prod exec snapcd-runner sh -c 'az config set core.login_experience_v2=off && az login && az account set --subscription <subscription-id>'
+   docker compose up -d && docker compose exec snapcd-runner sh -c 'az config set core.login_experience_v2=off && az login && az account set --subscription <subscription-id>'
    ```
 
 2. Open the URL that `az login` shows, and enter the code.
 3. Make sure that the bootstrap has a licence. The deployment has more than 10 Modules, which is the Community limit.
 4. Make sure that the Runner can clone this repository over SSH.
 
-With `.env.prod`, the bootstrap Server is at `http://localhost:7000`. The Runner reaches it at `http://snapcd-server:5000`. These are the defaults of `bootstrap_snapcd_url` and `bootstrap_snapcd_server_url_from_runner`.
+The bootstrap Server is at `http://localhost:5000`. The Runner reaches it at `http://snapcd-server:5000`. These are the defaults of `bootstrap_snapcd_url` and `bootstrap_snapcd_server_url_from_runner`.
 
 ## Configure
 
@@ -77,7 +77,7 @@ With `.env.prod`, the bootstrap Server is at `http://localhost:7000`. The Runner
 
 | Variable | Default | Description |
 |---|---|---|
-| `bootstrap_snapcd_url` | `http://localhost:7000` | The bootstrap Server, as your machine reaches it |
+| `bootstrap_snapcd_url` | `http://localhost:5000` | The bootstrap Server, as your machine reaches it |
 | `bootstrap_snapcd_server_url_from_runner` | `http://snapcd-server:5000` | The bootstrap Server, as the bootstrap Runner reaches it |
 | `bootstrap_stack_name` | `bootstrap` | The stack on the bootstrap that holds this deployment |
 | `bootstrap_namespace_name` | `azure` | The namespace on the bootstrap that holds the Modules |
